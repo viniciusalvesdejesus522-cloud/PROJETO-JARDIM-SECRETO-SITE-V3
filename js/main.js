@@ -208,13 +208,35 @@ async function savePost(title, description, imageUrl) {
   body: JSON.stringify(postData)
 });
         
-        if (response.ok) {
-            alert('✅ Post criado com sucesso!');
-            toggleCreatePost();
-            loadPosts();
-        } else {
-            throw new Error('Erro ao criar post');
-        }
+try {
+
+    const postData = {
+        title: title,
+        description: description,
+        image_url: imageUrl || '',
+        author_email: currentUser.email,
+        author_type: currentUser.type,
+        likes: 0,
+        dislikes: 0,
+        created_at: new Date().toISOString()
+    };
+
+    await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(postData)
+    });
+
+    alert('✅ Post enviado com sucesso!');
+    toggleCreatePost();
+    loadPosts();
+
+} catch (error) {
+
+    console.error('Erro ao criar post:', error);
+    alert('❌ Erro ao enviar post.');
+
+}
     } catch (error) {
         console.error('Erro ao criar post:', error);
         alert('❌ Erro ao criar post. Tente novamente.');
