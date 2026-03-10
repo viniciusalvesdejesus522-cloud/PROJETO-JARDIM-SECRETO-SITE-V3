@@ -8,6 +8,7 @@ let currentUser = {
 };
 
 let currentPostId = null; // Para controle de comentários
+let isPublishing = false; // bloqueia vários cliques no botão publicar
 
 // === INICIALIZAÇÃO ===
 document.addEventListener('DOMContentLoaded', function() {
@@ -190,7 +191,12 @@ async function createPost(event) {
 }
 
 async function savePost(title, description, imageUrl) {
+
+    if (isPublishing) return;
+    isPublishing = true;
+
     try {
+
         const postData = {
             title: title,
             description: description,
@@ -201,49 +207,74 @@ async function savePost(title, description, imageUrl) {
             dislikes: 0,
             created_at: new Date().toISOString()
         };
-        
-        const response = await fetch(API_URL, {
-  method: "POST",
-  mode: "no-cors",
-  body: JSON.stringify(postData)
-});
-        
-try {
 
-    const postData = {
-        title: title,
-        description: description,
-        image_url: imageUrl || '',
-        author_email: currentUser.email,
-        author_type: currentUser.type,
-        likes: 0,
-        dislikes: 0,
-        created_at: new Date().toISOString()
-    };
+        await fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(postData)
+        });
 
-    await fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(postData)
-    });
+        alert("✅ Post enviado!");
+        toggleCreatePost();
 
-    alert('✅ Post enviado com sucesso!');
-    toggleCreatePost();
-    loadPosts();
+        setTimeout(() => {
+            loadPosts();
+        }, 2000);
 
-} catch (error) {
-
-    console.error('Erro ao criar post:', error);
-    alert('❌ Erro ao enviar post.');
-
-}
     } catch (error) {
-        console.error('Erro ao criar post:', error);
-        alert('❌ Erro ao criar post. Tente novamente.');
+
+        console.error("Erro ao enviar post:", error);
+        alert("❌ Erro ao enviar post.");
+
+    } finally {
+
+        isPublishing = false;
+
     }
+
 }
 
 async function loadPosts() {
+    const container = document.getElementById('postsContainer');
+    container.innerHTML = "";
+
+    try {
+        const response = await fetch(API_URL + "?action=getPosts");
+        const posts = await response.json();
+
+        if (!posts || posts.length === 0) {
+            container.innerHTML = `
+                <div class="no-posts">
+                    <i class="fas fa-leaf"></i>
+                    <p>Nenhuma postagem ainda.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = "";
+
+        posts.reverse().forEach(post => {
+            const div = document.createElement("div");
+            div.className = "post-card";
+
+            div.innerHTML = `
+                <div class="post-body">
+                    <h2 class="post-title">${escapeHtml(post.title || "")}</h2>
+                    <p class="post-description">${escapeHtml(post.description || "")}</p>
+                    ${post.image_url ? `<img src="${post.image_url}" alt="${escapeHtml(post.title || "")}" class="post-image">` : ""}
+                    <small>👤 ${escapeHtml(post.author_email || "")}</small>
+                </div>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar posts:', error);
+        container.innerHTML = '<div class="loading">❌ Erro ao carregar postagens.</div>';
+    }
+}
 const container = document.getElementById('postsContainer');
 container.innerHTML = "";
 
@@ -306,7 +337,6 @@ container.innerHTML = "";
         console.error('Erro ao carregar posts:', error);
         container.innerHTML = '<div class="loading">❌ Erro ao carregar postagens.</div>';
     }
-}
 
 async function createPostElement(post) {
     const div = document.createElement('div');
