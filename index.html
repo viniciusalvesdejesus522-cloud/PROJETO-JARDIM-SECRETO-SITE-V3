@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Jardim Secreto</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-seedling"></i>
+                <h1>Projeto Jardim Secreto</h1>
+                <p class="subtitle">Um espaço de conexão e aprendizado</p>
+            </div>
+            
+            <div class="login-options">
+                <div class="login-card" id="guestLogin">
+                    <div class="card-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2>Convidado / Usuário</h2>
+                    <p>Acesso para visualizar e interagir com o conteúdo</p>
+                    <button class="btn btn-primary" onclick="loginAsGuest()">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                </div>
+                
+                <div class="login-card" id="devLogin">
+                    <div class="card-icon dev">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h2>Desenvolvedor / Professor</h2>
+                    <p>Acesso completo para criar e gerenciar conteúdo</p>
+                    <form onsubmit="loginAsDev(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Gmail</label>
+                            <input type="email" id="devEmail" required placeholder="seu@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Senha</label>
+                            <input type="password" id="devPassword" required placeholder="Digite a senha">
+                        </div>
+                        <button type="submit" class="btn btn-dev">
+                            <i class="fas fa-sign-in-alt"></i> Entrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="login-footer">
+                <p><i class="fas fa-leaf"></i> Cultivando conhecimento juntos</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela Principal (Feed) -->
+    <div id="mainScreen" class="screen">
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <h1>Jardim Secreto</h1>
+                </div>
+                <div class="user-info">
+                    <span id="userType"></span>
+                    <button class="btn btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Botão para criar post (apenas para desenvolvedores) -->
+                <div id="createPostSection" class="create-post-section" style="display: none;">
+                    <button class="btn btn-create-post" onclick="toggleCreatePost()">
+                        <i class="fas fa-plus-circle"></i> Criar Nova Postagem
+                    </button>
+                </div>
+
+                <!-- Formulário de criar post -->
+                <div id="createPostForm" class="post-form-container" style="display: none;">
+                    <div class="post-form">
+                        <h2><i class="fas fa-pen"></i> Nova Postagem</h2>
+                        <form onsubmit="createPost(event)">
+                            <div class="form-group">
+                                <label><i class="fas fa-heading"></i> Título</label>
+                                <input type="text" id="postTitle" required placeholder="Digite o título da postagem">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-align-left"></i> Descrição</label>
+                                <textarea id="postDescription" rows="5" required placeholder="Digite a descrição da postagem"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-image"></i> Imagem (opcional)</label>
+                                <div class="image-options">
+                                    <input type="url" id="postImageUrl" placeholder="Cole a URL da imagem">
+                                    <span class="or-divider">OU</span>
+                                    <input type="file" id="postImageFile" accept="image/*">
+                                </div>
+                                <div id="imagePreview" class="image-preview"></div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="toggleCreatePost()">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-dev">
+                                    <i class="fas fa-paper-plane"></i> Publicar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Feed de Posts -->
+                <div id="postsContainer" class="posts-container">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando postagens...
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            <p><i class="fas fa-leaf"></i> Projeto Jardim Secreto 2015 - Um espaço para crescer juntos</p>
+        </footer>
+    </div>
+
+    <!-- Modal de Comentários -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-comments"></i> Comentários</h2>
+                <button class="close-modal" onclick="closeCommentsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="commentsContainer">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando comentários...
+                    </div>
+                </div>
+                <div class="add-comment-form">
+                    <h3><i class="fas fa-comment-medical"></i> Adicionar Comentário</h3>
+                    <form onsubmit="addComment(event)">
+                        <textarea id="commentText" rows="3" required placeholder="Digite seu comentário..."></textarea>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Comentar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
