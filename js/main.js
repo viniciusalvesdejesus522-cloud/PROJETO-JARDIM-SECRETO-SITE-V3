@@ -202,11 +202,11 @@ async function savePost(title, description, imageUrl) {
             created_at: new Date().toISOString()
         };
         
-        const response = await fetch(API_URL + "?action=createPost", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(postData)
-        });
+        const response = await fetch(API_URL, {
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify(postData)
+});
         
         if (response.ok) {
             alert('✅ Post criado com sucesso!');
