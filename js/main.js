@@ -202,7 +202,7 @@ async function savePost(title, description, imageUrl) {
             created_at: new Date().toISOString()
         };
         
-        const response = await fetch('tables/posts', {
+        const response = await fetch(API_URL + "?action=createPost", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(postData)
@@ -223,10 +223,45 @@ async function savePost(title, description, imageUrl) {
 
 async function loadPosts() {
     const container = document.getElementById('postsContainer');
-    container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando postagens...</div>';
+    container.innerHTML = "🌿 Carregando postagens...";
+
+    try {
+
+        const response = await fetch(API_URL + "?action=getPosts");
+        const posts = await response.json();
+
+        if (posts.length === 0) {
+            container.innerHTML = "🌱 Ainda não há postagens.";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        posts.reverse().forEach(post => {
+
+            const div = document.createElement("div");
+            div.className = "post";
+
+            div.innerHTML = `
+                <h2>${post.title}</h2>
+                <p>${post.description}</p>
+                ${post.image_url ? `<img src="${post.image_url}" width="300">` : ""}
+                <small>👤 ${post.author_email}</small>
+            `;
+
+            container.appendChild(div);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+        container.innerHTML = "❌ Erro ao carregar postagens.";
+
+    }
     
     try {
-        const response = await fetch('tables/posts?limit=100&sort=-created_at');
+        const response = await fetch(API_URL + "?action=getPosts");
         const data = await response.json();
         
         if (data.data && data.data.length > 0) {
