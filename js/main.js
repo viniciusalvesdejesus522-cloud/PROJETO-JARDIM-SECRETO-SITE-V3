@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyzJnhNZ0DtpyBPhNnVP5rKH2HwXwgfwaMRNf3eZnDbH2_ALD0c4y0vSHBElrh7HZ6-/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyKm7uYNwexmcC0ib9arVBzpuERcUrZRZlqgyDcmwUgugtYoezlAL1KFuzMchCklVgX/exec";
 
 // === ESTADO DA APLICAÇÃO ===
 let currentUser = {
