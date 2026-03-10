@@ -244,8 +244,8 @@ try {
 }
 
 async function loadPosts() {
-    const container = document.getElementById('postsContainer');
-    container.innerHTML = "🌿 Carregando postagens...";
+const container = document.getElementById('postsContainer');
+container.innerHTML = "";
 
     try {
 
